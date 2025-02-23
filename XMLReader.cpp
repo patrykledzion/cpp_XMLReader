@@ -52,7 +52,8 @@ namespace nXMLReader {
 
 			if (ret != XMLReaderError::OK)
 			{
-				int x = 2137;
+				std::cout << "Interpreter error: " << (int)ret << " at pos: " << this->pos;
+				return ret;
 			}
 		}
 

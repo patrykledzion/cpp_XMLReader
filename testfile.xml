@@ -1,5 +1,3 @@
-
-
 <company>
     <name>ExampleCorp</name>
     <address>
@@ -119,5 +117,5 @@
                 </contract>
             </contracts>
         </client>
-    </clients>
+    </clients>		 
 </company>    

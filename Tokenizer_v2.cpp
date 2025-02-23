@@ -2,6 +2,19 @@
 
 
 namespace nXMLReader {
+
+	std::map<TokenizerError, std::string> Tokenizer2::str_err = {
+		{TokenizerError::OK, "OK"},
+		{TokenizerError::TAG_NOT_STARTED, "TAG_NOT_STARTED"},
+		{TokenizerError::TAG_NOT_ENDED, "TAG_NOT_ENDED"},
+		{TokenizerError::CHAR_NOT_EXPECTED, "CHAR_NOT_EXPECTED"},
+		{TokenizerError::TAG_NOT_CLOSED, "TAG_NOT_CLOSED"},
+		{TokenizerError::EXPECTED_QUOTE_MARK, "EXPECTED_QUOTE_MARK"},
+		{TokenizerError::UNEXPECTED_TEXT, "UNEXPECTED_TEXT"},
+		{TokenizerError::OTHER, "OTHER"},
+		{TokenizerError::OK_EOF, "OK_EOF"}
+	};
+
 	Tokenizer2::Tokenizer2(std::string content)
 	{
 		this->content = content;
@@ -42,7 +55,25 @@ namespace nXMLReader {
 
 			if (ret != TokenizerError::OK)
 			{
-				int x = 2137;
+				this->err = ret;
+				int line = 0;
+				int pos_in_line = 0;
+
+				for (int i = 0; i < this->pos; i++)
+				{
+					pos_in_line++;
+					if(isspace(this->content.at(i)) && pos_in_line==1)pos_in_line = 0;
+					if (this->content.at(i) == '\n')
+					{
+						line++;
+						pos_in_line = 0;
+					}
+				}
+
+				line++;
+				pos_in_line++;
+				std::cout << "Tokenizer error: " << Tokenizer2::str_err[ret] << " in line " << line << " at pos " << pos_in_line << std::endl;
+				return nullptr;
 			}
 		}
 		this->err = ret;

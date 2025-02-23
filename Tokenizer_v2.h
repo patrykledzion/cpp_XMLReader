@@ -5,6 +5,8 @@
 #include "XMLProperty.h"
 #include "Token.h"
 
+
+
 namespace nXMLReader {
 
 	enum class TokenizerError {
@@ -28,7 +30,7 @@ namespace nXMLReader {
 	
 	public:
 		TokenizerError err = TokenizerError::OK;
-
+		static std::map<TokenizerError, std::string> str_err;
 		Tokenizer2(std::string content);
 		std::vector<Token>* Tokenize();
 		TokenizerError HandleOpeningBracket();		// <
