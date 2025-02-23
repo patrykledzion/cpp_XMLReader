@@ -1,35 +1,123 @@
-<breakfast_menu>
-    <script id="eppiocemhmnlbhjplcgkofciiegomcon"/>
-    <script/>
-    <script/>
-    <food>
-        <name>Belgian Waffles</name>
-        <price>$5.95</price>
-        <description>Two of our famous Belgian Waffles with plenty of real maple syrup</description>
-        <calories>650</calories>
-    </food>
-    <food>
-        <name>Strawberry Belgian Waffles</name>
-        <price>$7.95</price>
-        <description>Light Belgian waffles covered with strawberries and whipped cream</description>
-        <calories>900</calories>
-    </food>
-    <food>
-        <name>Berry-Berry Belgian Waffles</name>
-        <price>$8.95</price>
-        <description>Light Belgian waffles covered with an assortment of fresh berries and whipped cream</description>
-        <calories>900</calories>
-    </food>
-    <food>
-        <name>French Toast</name>
-        <price>$4.50</price>
-        <description>Thick slices made from our homemade sourdough bread</description>
-        <calories>600</calories>
-    </food>
-    <food>
-        <name>Homestyle Breakfast</name>
-        <price>$6.95</price>
-        <description>Two eggs, bacon or sausage, toast, and our ever-popular hash browns</description>
-        <calories>950</calories>
-    </food>
-</breakfast_menu>
+
+
+<company>
+    <name>ExampleCorp</name>
+    <address>
+        <street>Main Street 123</street>
+        <city>SampleCity</city>
+        <postalCode>12345</postalCode>
+        <country>Exampleland</country>
+    </address>
+    <departments>
+        <department id="D001">
+            <name>Software Development</name>
+            <manager>Jane Smith</manager>
+            <employees>
+                <employee id="E001">
+                    <name>John Doe</name>
+                    <position>Software Engineer</position>
+                    <salary currency="USD">75000</salary>
+                    <contact>
+                        <email>johndoe@example.com</email>
+                        <phone>+123456789</phone>
+                    </contact>
+                </employee>
+                <employee id="E003">
+                    <name>Mary Johnson</name>
+                    <position>UI/UX Designer</position>
+                    <salary currency="USD">70000</salary>
+                    <contact>
+                        <email>maryj@example.com</email>
+                        <phone>+1123581321</phone>
+                    </contact>
+                </employee>
+            </employees>
+        </department>
+        <department id="D002">
+            <name>Project Management</name>
+            <manager>Michael Brown</manager>
+            <employees>
+                <employee id="E002">
+                    <name>Jane Smith</name>
+                    <position>Project Manager</position>
+                    <salary currency="USD">85000</salary>
+                    <contact>
+                        <email>janesmith@example.com</email>
+                        <phone>+987654321</phone>
+                    </contact>
+                </employee>
+            </employees>
+        </department>
+    </departments>
+    <projects>
+        <project id="P1001">
+            <name>Alpha Project</name>
+            <deadline>2025-12-31</deadline>
+            <budget currency="USD">500000</budget>
+            <team>
+                <member id="E001" role="Developer"/>
+                <member id="E002" role="Manager"/>
+            </team>
+            <tasks>
+                <task id="T001">
+                    <description>Develop backend API</description>
+                    <assignedTo id="E001"/>
+                    <status>In Progress</status>
+                </task>
+                <task id="T002">
+                    <description>Manage project timeline</description>
+                    <assignedTo id="E002"/>
+                    <status>Pending</status>
+                </task>
+            </tasks>
+        </project>
+        <project id="P1002">
+            <name>Beta Project</name>
+            <deadline>2026-06-30</deadline>
+            <budget currency="USD">300000</budget>
+            <team>
+                <member id="E002" role="Manager"/>
+                <member id="E003" role="Designer"/>
+            </team>
+            <tasks>
+                <task id="T003">
+                    <description>Create UI design</description>
+                    <assignedTo id="E003"/>
+                    <status>Not Started</status>
+                </task>
+            </tasks>
+        </project>
+    </projects>
+    <clients>
+        <client id="C001">
+            <name>Acme Inc.</name>
+            <industry>Technology</industry>
+            <contact>
+                <email>contact@acme.com</email>
+                <phone>+1122334455</phone>
+            </contact>
+            <contracts>
+                <contract id="CT001">
+                    <startDate>2024-01-01</startDate>
+                    <endDate>2025-12-31</endDate>
+                    <value currency="USD">1000000</value>
+                </contract>
+            </contracts>
+        </client>
+        <client id="C002">
+            <name>Beta Solutions</name>
+            <industry>Finance</industry>
+            <contact>
+                <email>info@betasolutions.com</email>
+                <phone>+5566778899</phone>
+            </contact>
+            <contracts>
+                <contract id="CT002">
+                    <startDate>2024-06-01</startDate>
+                    <endDate>2026-06-30</endDate>
+                    <value currency="USD">750000</value>
+                </contract>
+            </contracts>
+        </client>
+    </clients>
+</company>    

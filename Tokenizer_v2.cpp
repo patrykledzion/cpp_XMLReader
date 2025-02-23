@@ -20,6 +20,18 @@ namespace nXMLReader {
 
 		while (this->pos < this->content.length() && ret != TokenizerError::OK_EOF)
 		{
+			while (isspace(this->content.at(this->pos)))
+			{
+				if (this->pos >= this->content.length() - 1)
+				{
+					ret = TokenizerError::OK_EOF;
+					break;
+				}
+				this->pos++;
+			}
+
+			if (ret == TokenizerError::OK_EOF)break;
+			
 			if (this->content.at(this->pos) == '<')
 			{
 				ret = this->HandleOpeningBracket();

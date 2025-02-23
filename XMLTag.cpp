@@ -1,4 +1,4 @@
-#include "XMLTag.h"
+﻿#include "XMLTag.h"
 
 namespace nXMLReader {
 	std::map<_XMLTAG_, std::string> tags = {
