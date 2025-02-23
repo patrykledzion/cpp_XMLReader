@@ -41,7 +41,10 @@ class XMLReader
 	XMLReaderError HandleClosingBracket();
 	XMLReaderError HandleText();
 
+	XMLReaderError PrintError(XMLReaderError err);
+
 public:
+	static std::map < XMLReaderError, std::string> err_str;
 	XMLReader(std::string filename);
 	XMLReaderError Read();
 	std::vector<XMLTag>* GetTags() { return this->tags; }

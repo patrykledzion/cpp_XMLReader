@@ -1,6 +1,15 @@
 #include "XMLReader.h"
 
 namespace nXMLReader {
+
+	std::map < XMLReaderError, std::string> XMLReader::err_str = {
+			{XMLReaderError::OK, "OK"},
+			{XMLReaderError::OTHER_PROBLEM, "OTHER_PROBLEM"},
+			{XMLReaderError::TAG_NOT_ENDED, "TAG_NOT_ENDED"},
+			{XMLReaderError::TAG_NOT_STARTED, "TAG_NOT_STARTED"},
+			{XMLReaderError::UNEXPECTED_TOKEN, "UNEXPECTED_TOKEN"},
+	};
+
 	XMLReader::XMLReader(std::string filename)
 	{
 		this->file = new File(std::move(filename));
@@ -50,12 +59,10 @@ namespace nXMLReader {
 				ret = XMLReaderError::UNEXPECTED_TOKEN;
 			}
 
-			if (ret != XMLReaderError::OK)
-			{
-				std::cout << "Interpreter error: " << (int)ret << " at pos: " << this->pos;
-				return ret;
-			}
+			if (ret != XMLReaderError::OK)return this->PrintError(ret);
 		}
+
+		if (this->currTags->size() > 0 || this->openedTag!=nullptr)return this->PrintError(XMLReaderError::TAG_NOT_ENDED);
 
 		return XMLReaderError::OK;
 	}
@@ -108,7 +115,7 @@ namespace nXMLReader {
 				return XMLReaderError::UNEXPECTED_TOKEN;
 
 			//handle name
-			if (this->GetCurrentToken()->value != this->GetLastCurrTag()->GetTagName())return XMLReaderError::TAG_NOT_STARTED;
+			if (this->GetCurrentToken()->value != this->GetLastCurrTag()->GetTagName())return XMLReaderError::TAG_NOT_ENDED;
 			if (this->currTags->size() > 1)
 			{
 				XMLTag ct = *GetLastCurrTag();
@@ -232,5 +239,14 @@ namespace nXMLReader {
 		pos++;
 		 
 		return XMLReaderError::OK;
+	}
+	XMLReaderError XMLReader::PrintError(XMLReaderError err)
+	{
+		if(this->currTags->size() > 0)
+			std::cout << "Interpreter error: " << XMLReader::err_str[err] << " (" << this->GetLastCurrTag()->GetTagName() << ")" << std::endl;
+		else if(this->openedTag!=nullptr)
+			std::cout << "Interpreter error: " << XMLReader::err_str[err] << " (" << this->openedTag->GetTagName() << ")" << std::endl;
+
+		return err;
 	}
 }

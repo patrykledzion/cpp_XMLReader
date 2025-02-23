@@ -18,7 +18,8 @@ namespace nXMLReader {
 		EXPECTED_QUOTE_MARK,
 		UNEXPECTED_TEXT,
 		OTHER,
-		OK_EOF
+		OK_EOF,
+		ERR_EOF,
 	};
 
 	class Tokenizer2
@@ -27,7 +28,7 @@ namespace nXMLReader {
 		std::string content;
 		size_t pos = 0;
 		std::vector<Token>* tokens;
-	
+		TokenizerError PrintError(TokenizerError err);
 	public:
 		TokenizerError err = TokenizerError::OK;
 		static std::map<TokenizerError, std::string> str_err;

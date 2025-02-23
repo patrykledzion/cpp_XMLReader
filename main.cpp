@@ -8,6 +8,8 @@ int main()
 	nXMLReader::XMLReader* reader = new nXMLReader::XMLReader("testfile.xml");
 	nXMLReader::XMLReaderError ret = reader->Read();
 
+	if (ret != nXMLReader::XMLReaderError::OK)return 1;
+
 	for (int i = 0; i < reader->GetTags()->size(); i++)
 	{
 		reader->GetTags()->at(i).PrintTag(0);

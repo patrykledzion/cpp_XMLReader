@@ -12,8 +12,33 @@ namespace nXMLReader {
 		{TokenizerError::EXPECTED_QUOTE_MARK, "EXPECTED_QUOTE_MARK"},
 		{TokenizerError::UNEXPECTED_TEXT, "UNEXPECTED_TEXT"},
 		{TokenizerError::OTHER, "OTHER"},
-		{TokenizerError::OK_EOF, "OK_EOF"}
+		{TokenizerError::OK_EOF, "OK_EOF"},
+		{TokenizerError::ERR_EOF, "ERR_EOF"},
 	};
+
+	TokenizerError Tokenizer2::PrintError(TokenizerError err)
+	{
+		this->err = err;
+		int line = 0;
+		int pos_in_line = 0;
+
+		for (int i = 0; i < this->pos; i++)
+		{
+			pos_in_line++;
+			if (isspace(this->content.at(i)) && pos_in_line == 1)pos_in_line = 0;
+			if (this->content.at(i) == '\n')
+			{
+				line++;
+				pos_in_line = 0;
+			}
+		}
+
+		line++;
+		pos_in_line++;
+		std::cout << "Tokenizer error: " << Tokenizer2::str_err[err] << " in line " << line << " at pos " << pos_in_line << std::endl;
+	
+		return err;
+	}
 
 	Tokenizer2::Tokenizer2(std::string content)
 	{
@@ -53,26 +78,9 @@ namespace nXMLReader {
 				ret = this->HandleText();
 			}
 
-			if (ret != TokenizerError::OK)
+			if (ret != TokenizerError::OK && ret!= TokenizerError::OK_EOF)
 			{
-				this->err = ret;
-				int line = 0;
-				int pos_in_line = 0;
-
-				for (int i = 0; i < this->pos; i++)
-				{
-					pos_in_line++;
-					if(isspace(this->content.at(i)) && pos_in_line==1)pos_in_line = 0;
-					if (this->content.at(i) == '\n')
-					{
-						line++;
-						pos_in_line = 0;
-					}
-				}
-
-				line++;
-				pos_in_line++;
-				std::cout << "Tokenizer error: " << Tokenizer2::str_err[ret] << " in line " << line << " at pos " << pos_in_line << std::endl;
+				this->PrintError(ret);
 				return nullptr;
 			}
 		}
@@ -85,7 +93,14 @@ namespace nXMLReader {
 		this->tokens->push_back(Token(TokenType::OPENING_BRACKET, "<"));
 
 		//handle spaces
-		while (isspace(this->content.at(++this->pos)));
+		while (isspace(this->content.at(++this->pos))) 
+		{
+			if (this->pos >= this->content.length() - 1)
+			{
+				return TokenizerError::ERR_EOF;
+			}
+		}
+
 
 		if (XMLTag::isTagNameStartCharacter(this->content.at(this->pos)))
 		{
@@ -108,13 +123,18 @@ namespace nXMLReader {
 
 		while (XMLTag::isTagNameCharacter(this->content.at(this->pos)))
 		{
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
 			builder += this->content.at(this->pos++);
 		}
 
 		this->tokens->push_back(Token(TokenType::TAG_NAME, std::move(builder)));
 
 		//handle spaces
-		while (isspace(this->content.at(this->pos)))this->pos++;
+		while (isspace(this->content.at(this->pos)))
+		{
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
+			this->pos++;
+		}
 
 		if (this->content.at(this->pos) == '>')
 		{
@@ -156,6 +176,7 @@ namespace nXMLReader {
 		std::string builder;
 		while (XMLProperty::isPropertyNameCharacter(this->content.at(this->pos)))
 		{
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
 			builder += this->content.at(this->pos++);
 		}
 
@@ -164,8 +185,12 @@ namespace nXMLReader {
 		char c = this->content.at(this->pos);
 		int x = 2137;
 		//handle spaces
-		while (isspace(this->content.at(this->pos)))this->pos++;
+		while (isspace(this->content.at(this->pos)))
+		{
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
 
+			this->pos++;
+		}
 		c = this->content.at(this->pos);
 		x = 2137;
 
@@ -198,7 +223,10 @@ namespace nXMLReader {
 		//this->tokens->push_back(Token(TokenType::EQUAL_SIGN, "="));
 
 		//Handle spaces
-		while (isspace(this->content.at(++this->pos)));
+		do {
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
+		} while (isspace(this->content.at(++this->pos)));
+
 
 		if (this->content.at(this->pos) == '\"')
 		{
@@ -223,13 +251,17 @@ namespace nXMLReader {
 		this->pos++;
 		while (this->content.at(this->pos) != '\"')
 		{
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
 			builder += this->content.at(this->pos++);
 		}
 
 		this->tokens->push_back(Token(TokenType::PROPERTY_VALUE, std::move(builder)));
 
 		//Handle spaces
-		while (isspace(this->content.at(++this->pos)));
+		do {
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
+		} while (isspace(this->content.at(++this->pos)));
+		
 
 		if (this->content.at(this->pos) == '>')
 		{
@@ -257,6 +289,7 @@ namespace nXMLReader {
 
 		while (this->content.at(this->pos) != '<')
 		{
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
 			builder += this->content.at(this->pos++);
 		}
 
@@ -270,6 +303,9 @@ namespace nXMLReader {
 		this->tokens->push_back(Token(TokenType::CLOSING_SLASH, "/"));
 
 		//handle spaces
+		do {
+			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
+		}
 		while (isspace(this->content.at(++this->pos)));
 
 		if (XMLTag::isTagNameStartCharacter(this->content.at(this->pos)))
