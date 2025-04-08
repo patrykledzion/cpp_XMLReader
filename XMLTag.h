@@ -5,37 +5,32 @@
 #include "XMLProperty.h"
 
 namespace nXMLReader {
-	enum _XMLTAG_ {
-		START,
-		VIEW,
-		TEXT,
-	};
 
 	class XMLTag
 	{
 	private:
 		std::string tag;
 		//Property properties[];
-		std::vector<XMLProperty*>* properties;
+		std::unique_ptr<std::vector<std::shared_ptr<XMLProperty>>> properties;
 		std::string innerXML;
-		std::vector<XMLTag>* children;
+		std::shared_ptr<std::vector<XMLTag>> children;
 		void AddProperty(std::string name, std::string value);
 	public:
 		static bool isTagNameCharacter(char c);
 		static bool isTagNameStartCharacter(char c);
 
 		XMLTag(std::string tag);
+		~XMLTag() = default;
+		XMLTag(const XMLTag& other);
 		void SetProperty(std::string name, std::string value);
 		void SetInnerXML(std::string value);
-		void AddChild(XMLTag child);
+		void AddChild(XMLTag& child);
 
 		std::string GetInnerXML() const { return this->innerXML; }
 		std::string GetTagName() const { return this->tag; }
-		std::vector<XMLTag>* GetChildren() const { return this->children; }
+		std::weak_ptr<std::vector<XMLTag>> GetChildren() const { return this->children; }
 
-		void PrintTag(int level);
-		//Property* GetProperty(name);
-		static std::map<_XMLTAG_, std::string> tags;
+		void PrintTag(int level); 
 	};
 
 

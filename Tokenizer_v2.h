@@ -27,13 +27,13 @@ namespace nXMLReader {
 	private:
 		std::string content;
 		size_t pos = 0;
-		std::vector<Token>* tokens;
+		std::unique_ptr<std::vector<Token>> tokens;
 		TokenizerError PrintError(TokenizerError err);
 	public:
 		TokenizerError err = TokenizerError::OK;
 		static std::map<TokenizerError, std::string> str_err;
 		Tokenizer2(std::string content);
-		std::vector<Token>* Tokenize();
+		std::unique_ptr<std::vector<Token>> Tokenize();
 		TokenizerError HandleOpeningBracket();		// <
 		TokenizerError HandleTagName();
 		TokenizerError HandleClosingBracket();		// >
@@ -43,8 +43,8 @@ namespace nXMLReader {
 		TokenizerError HandlePropertyValue();		// Property value
 		TokenizerError HandleText();				// Text
 		TokenizerError HandleCloseSlash();			// /
-	
-		bool IsLastChar(int pos); 
+
+		bool IsLastChar(int pos);
 
 		size_t GetCursorPosition() { return this->pos; }
 	};

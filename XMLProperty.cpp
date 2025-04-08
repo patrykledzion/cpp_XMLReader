@@ -2,10 +2,6 @@
 
 
 namespace nXMLReader {
-	std::map<_XMLPROPERTY_, std::string> XMLProperty::properties = {
-		{ _XMLPROPERTY_::ID, "id" },
-		{ _XMLPROPERTY_::CLASS, "class"}
-	};
 
 	XMLProperty::XMLProperty(std::string name, std::string value)
 		: name(std::move(name)), value(std::move(value)) {}
@@ -26,6 +22,16 @@ namespace nXMLReader {
 
 	bool XMLProperty::isPropertyNameCharacter(char c)
 	{
+
+		return (
+			(c == '-' || c == '.' || c == 0xB7) ||
+			(isdigit(c)) ||
+			(c >= 0x300 && c <= 0x036f) ||
+			(c >= 0x203F && c <= 0x2040) ||
+			(XMLProperty::isPropertyNameStartCharacter(c))
+
+			);
+
 		if (c == '-' || c == '.' || c == 0xB7)				return true;
 		if (isdigit(c))										return true;
 		if (c >= 0x300 && c <= 0x036f)						return true;

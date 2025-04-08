@@ -36,17 +36,17 @@ namespace nXMLReader {
 		line++;
 		pos_in_line++;
 		std::cout << "Tokenizer error: " << Tokenizer2::str_err[err] << " in line " << line << " at pos " << pos_in_line << std::endl;
-	
+
 		return err;
 	}
 
 	Tokenizer2::Tokenizer2(std::string content)
 	{
 		this->content = content;
-		this->tokens = new std::vector<Token>();
+		this->tokens = std::make_unique<std::vector<Token>>();
 	}
 
-	std::vector<Token>* Tokenizer2::Tokenize()
+	std::unique_ptr<std::vector<Token>> Tokenizer2::Tokenize()
 	{
 		if (this->tokens == nullptr)
 		{
@@ -69,7 +69,7 @@ namespace nXMLReader {
 			}
 
 			if (ret == TokenizerError::OK_EOF)break;
-			
+
 			if (this->content.at(this->pos) == '<')
 			{
 				ret = this->HandleOpeningBracket();
@@ -78,14 +78,14 @@ namespace nXMLReader {
 				ret = this->HandleText();
 			}
 
-			if (ret != TokenizerError::OK && ret!= TokenizerError::OK_EOF)
+			if (ret != TokenizerError::OK && ret != TokenizerError::OK_EOF)
 			{
 				this->PrintError(ret);
 				return nullptr;
 			}
 		}
 		this->err = ret;
-		return ret==TokenizerError::OK || ret==TokenizerError::OK_EOF ? this->tokens : nullptr;
+		return ret == TokenizerError::OK || ret == TokenizerError::OK_EOF ? std::make_unique<std::vector<Token>>(*this->tokens) : nullptr;
 	}
 
 	TokenizerError Tokenizer2::HandleOpeningBracket()
@@ -93,7 +93,7 @@ namespace nXMLReader {
 		this->tokens->push_back(Token(TokenType::OPENING_BRACKET, "<"));
 
 		//handle spaces
-		while (isspace(this->content.at(++this->pos))) 
+		while (isspace(this->content.at(++this->pos)))
 		{
 			if (this->pos >= this->content.length() - 1)
 			{
@@ -261,7 +261,7 @@ namespace nXMLReader {
 		do {
 			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
 		} while (isspace(this->content.at(++this->pos)));
-		
+
 
 		if (this->content.at(this->pos) == '>')
 		{
@@ -305,8 +305,7 @@ namespace nXMLReader {
 		//handle spaces
 		do {
 			if (this->pos >= this->content.length() - 1)return TokenizerError::ERR_EOF;
-		}
-		while (isspace(this->content.at(++this->pos)));
+		} while (isspace(this->content.at(++this->pos)));
 
 		if (XMLTag::isTagNameStartCharacter(this->content.at(this->pos)))
 		{

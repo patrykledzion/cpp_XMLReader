@@ -12,10 +12,10 @@ namespace nXMLReader {
 
 	XMLReader::XMLReader(std::string filename)
 	{
-		this->file = new File(std::move(filename));
-		this->tags = new std::vector<XMLTag>();
+		this->file = std::make_unique<File>(std::move(filename));
+		this->tags = std::make_shared<std::vector<XMLTag>>();
 		this->tokens = nullptr;
-		this->currTags = new std::vector<XMLTag>();
+		this->currTags = std::make_shared<std::vector<XMLTag>>();
 		this->openedTag = nullptr;
 	}
 
@@ -49,20 +49,20 @@ namespace nXMLReader {
 
 			switch (this->GetCurrentToken()->type)
 			{
-			case TokenType::OPENING_BRACKET: 
+			case TokenType::OPENING_BRACKET:
 				ret = this->HandleOpeningBracket();
 				break;
 			case TokenType::TEXT:
 				ret = this->HandleText();
 				break;
-			default: 
+			default:
 				ret = XMLReaderError::UNEXPECTED_TOKEN;
 			}
 
 			if (ret != XMLReaderError::OK)return this->PrintError(ret);
 		}
 
-		if (this->currTags->size() > 0 || this->openedTag!=nullptr)return this->PrintError(XMLReaderError::TAG_NOT_ENDED);
+		if (this->currTags->size() > 0 || this->openedTag != nullptr)return this->PrintError(XMLReaderError::TAG_NOT_ENDED);
 
 		return XMLReaderError::OK;
 	}
@@ -70,17 +70,17 @@ namespace nXMLReader {
 	{
 		//handle bracket
 		this->bracketOpened = true;
-		
+
 		this->pos++;
 		if (this->GetCurrentToken() == nullptr)return XMLReaderError::OTHER_PROBLEM;
 
 		switch (this->GetCurrentToken()->type)
 		{
-		case TokenType::TAG_NAME: 
+		case TokenType::TAG_NAME:
 			return this->HandleTagName();
 		case TokenType::CLOSING_SLASH:
 			return this->HandleClosingSlash();
-		default: 
+		default:
 			return XMLReaderError::UNEXPECTED_TOKEN;
 		}
 
@@ -93,7 +93,7 @@ namespace nXMLReader {
 		{
 			if (!this->bracketOpened || this->openedTag != nullptr)
 				return XMLReaderError::UNEXPECTED_TOKEN;
-			this->openedTag = new XMLTag(this->GetCurrentToken()->value);
+			this->openedTag = std::make_unique<XMLTag>(this->GetCurrentToken()->value);
 
 			this->pos++;
 
@@ -118,7 +118,7 @@ namespace nXMLReader {
 			if (this->GetCurrentToken()->value != this->GetLastCurrTag()->GetTagName())return XMLReaderError::TAG_NOT_ENDED;
 			if (this->currTags->size() > 1)
 			{
-				XMLTag ct = *GetLastCurrTag();
+				XMLTag& ct = *GetLastCurrTag();
 				this->currTags->at(this->currTags->size() - 2).AddChild(ct);
 				this->currTags->pop_back();
 
@@ -127,12 +127,12 @@ namespace nXMLReader {
 				this->tags->push_back(*this->GetLastCurrTag());
 				this->currTags->pop_back();
 			}
-			
+
 			this->pos++; // ">"
 			this->pos++; //Next token
 			return XMLReaderError::OK;
 		}
-		
+
 
 		return XMLReaderError::OK;
 	}
@@ -149,7 +149,7 @@ namespace nXMLReader {
 			return this->HandleClosingBracket();
 		case TokenType::TAG_NAME:
 			return this->HandleTagName();
-		default: 
+		default:
 			return XMLReaderError::UNEXPECTED_TOKEN;
 		}
 
@@ -163,7 +163,7 @@ namespace nXMLReader {
 
 		this->pos++;
 
-		switch(this->GetCurrentToken()->type)
+		switch (this->GetCurrentToken()->type)
 		{
 		case TokenType::PROPERTY_VALUE:
 			return this->HandlePropertyValue();
@@ -176,7 +176,7 @@ namespace nXMLReader {
 		default:
 			return XMLReaderError::UNEXPECTED_TOKEN;
 		}
-		
+
 		return XMLReaderError::OK;
 	}
 	XMLReaderError XMLReader::HandlePropertyValue()
@@ -193,7 +193,7 @@ namespace nXMLReader {
 			return this->HandleClosingBracket();
 		case TokenType::PROPERTY_NAME:
 			return this->HandlePropertyName();
-		default: 
+		default:
 			return XMLReaderError::UNEXPECTED_TOKEN;
 		}
 
@@ -215,19 +215,19 @@ namespace nXMLReader {
 
 			if (this->currTags->size() > 0)
 			{
-				XMLTag ct = *this->openedTag;
+				XMLTag& ct = *this->openedTag;
 				this->currTags->at(this->currTags->size() - 1).AddChild(ct);
 				this->openedTag = nullptr;
 			}
 			else {
-				XMLTag ct = *this->openedTag;
+				XMLTag& ct = *this->openedTag;
 				this->tags->push_back(ct);
 				this->openedTag = nullptr;
 			}
 
 			this->pos++;
 		}
-		
+
 		this->bracketOpened = false;
 		return XMLReaderError::OK;
 	}
@@ -237,14 +237,14 @@ namespace nXMLReader {
 
 		this->GetLastCurrTag()->SetInnerXML(this->GetCurrentToken()->value);
 		pos++;
-		 
+
 		return XMLReaderError::OK;
 	}
 	XMLReaderError XMLReader::PrintError(XMLReaderError err)
 	{
-		if(this->currTags->size() > 0)
+		if (this->currTags->size() > 0)
 			std::cout << "Interpreter error: " << XMLReader::err_str[err] << " (" << this->GetLastCurrTag()->GetTagName() << ")" << std::endl;
-		else if(this->openedTag!=nullptr)
+		else if (this->openedTag != nullptr)
 			std::cout << "Interpreter error: " << XMLReader::err_str[err] << " (" << this->openedTag->GetTagName() << ")" << std::endl;
 
 		return err;
